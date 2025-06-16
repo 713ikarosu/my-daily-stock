@@ -1,7 +1,7 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.5.1/schema.json",
   "organizeImports": {
-    "enabled": false
+    "enabled": true
   },
   "linter": {
     "enabled": true,
@@ -10,7 +10,8 @@
         "useExhaustiveDependencies": "off",
         "noInnerDeclarations": "off",
         "noUnnecessaryContinue": "off",
-        "noConstructorReturn": "off"
+        "noConstructorReturn": "off",
+        "noUnusedImports": "error"
       },
       "suspicious": {
         "noImplicitAnyLet": "off",

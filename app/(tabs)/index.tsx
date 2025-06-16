@@ -1,55 +1,154 @@
-import { ExternalLink } from '@tamagui/lucide-icons'
-import { Anchor, H2, Paragraph, XStack, YStack } from 'tamagui'
-import { ToastControl } from 'app/CurrentToast'
+import { Button, Card, H2, Input, Paragraph, XStack, YStack } from "tamagui";
+import { useState } from "react";
+import { Minus, Plus, X } from "@tamagui/lucide-icons";
+
+interface StockItem {
+  id: string;
+  name: string;
+  quantity: number;
+}
+
+const initialItems: StockItem[] = [
+  { id: "1", name: "シャンプー", quantity: 2 },
+  { id: "2", name: "ティッシュ", quantity: 3 },
+  { id: "3", name: "トイレットペーパー", quantity: 1 },
+];
 
 export default function TabOneScreen() {
+  const [items, setItems] = useState<StockItem[]>(initialItems);
+  const [newItemName, setNewItemName] = useState("");
+
+  const decreaseQuantity = (id: string) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+      )
+    );
+  };
+
+  const increaseQuantity = (id: string) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+
+  const removeItem = (id: string) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  };
+
+  const addItem = () => {
+    if (newItemName.trim() === "") {
+      alert("アイテム名を入力してや！");
+      return;
+    }
+    const newItem: StockItem = {
+      id: String(Date.now()),
+      name: newItemName.trim(),
+      quantity: 0,
+    };
+    setItems((prevItems) => [...prevItems, newItem]);
+    setNewItemName("");
+  };
   return (
-    <YStack flex={1} items="center" gap="$8" px="$10" pt="$5" bg="$background">
-      <H2>Tamagui + Expo</H2>
-
-      <ToastControl />
-
-      <XStack
-        items="center"
-        justify="center"
-        flexWrap="wrap"
-        gap="$1.5"
-        position="absolute"
-        b="$8"
+    <YStack
+      gap="$4"
+      height="100%"
+      bg="$blue2"
+      style={{
+        alignItems: "center",
+        justifyContent: "flex-start",
+        paddingTop: 16,
+        padding: "$4",
+      }}
+    >
+      <YStack
+        width="100%"
+        borderColor="$blue8"
+        borderWidth={1}
+        style={{ borderRadius: 16, padding: 16 }}
       >
-        <Paragraph fontSize="$5">Add</Paragraph>
+        <H2 style={{ textAlign: "center" }} color="$blue8">
+          My Stock
+        </H2>
+      </YStack>
 
-        <Paragraph fontSize="$5" px="$2" py="$1" color="$blue10" bg="$blue5">
-          tamagui.config.ts
-        </Paragraph>
-
-        <Paragraph fontSize="$5">to root and follow the</Paragraph>
-
+      <YStack
+        gap="$6"
+        style={{
+          width: "100%",
+          maxWidth: 600,
+        }}
+      >
         <XStack
-          items="center"
-          gap="$1.5"
-          px="$2"
-          py="$1"
-          rounded="$3"
-          bg="$green5"
-          hoverStyle={{ bg: '$green6' }}
-          pressStyle={{ bg: '$green4' }}
+          gap="$2"
+          style={{
+            alignItems: "center",
+          }}
         >
-          <Anchor
-            href="https://tamagui.dev/docs/core/configuration"
-            textDecorationLine="none"
-            color="$green10"
-            fontSize="$5"
-          >
-            Configuration guide
-          </Anchor>
-          <ExternalLink size="$1" color="$green10" />
+          <Input
+            flex={1}
+            placeholder="New Item"
+            value={newItemName}
+            onChangeText={setNewItemName}
+          />
+          <Button size="$4" onPress={addItem} icon={Plus}>
+            追加
+          </Button>
         </XStack>
 
-        <Paragraph fontSize="$5" text="center">
-          to configure your themes and tokens.
-        </Paragraph>
-      </XStack>
+        <YStack gap="$3">
+          {items.map((item) => (
+            <Card
+              key={item.id}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-between"
+              p={12}
+              backgroundColor="$blue3"
+              borderColor="$blue5"
+              borderWidth={1}
+              borderRadius={24}
+              animation="quick"
+              hoverStyle={{
+                scale: 1.02,
+                backgroundColor: "$blue6",
+                borderColor: "$blue10",
+              }}
+            >
+              <YStack flex={1}>
+                <Paragraph fontSize="$6" fontWeight="bold">
+                  {item.name}
+                </Paragraph>
+                <Paragraph fontSize="$4" color="$color11">
+                  残り: {item.quantity}
+                </Paragraph>
+              </YStack>
+
+              <XStack gap="$2">
+                <Button
+                  size="$2"
+                  onPress={() => decreaseQuantity(item.id)}
+                  icon={Minus}
+                />
+                <Button
+                  size="$2"
+                  onPress={() => increaseQuantity(item.id)}
+                  icon={Plus}
+                />
+                <Button
+                  size="$2"
+                  onPress={() => removeItem(item.id)}
+                  icon={X}
+                  bg="$red10"
+                />
+              </XStack>
+            </Card>
+          ))}
+        </YStack>
+      </YStack>
     </YStack>
-  )
+  );
 }
